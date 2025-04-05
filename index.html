@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATM Систем</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: plum;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        .task {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-left: 5px solid #3498db;
+            border-radius: 8px;
+        }
+
+        input[type="text"], input[type="number"] {
+            padding: 10px;
+            width: 220px;
+            font-size: 16px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            padding: 10px 16px;
+            margin-top: 10px;
+            background-color: #3498db;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #balance {
+            font-weight: bold;
+            color: green;
+        }
+
+        #sumResult, #atmMessage {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        #task3 {
+            text-align: center;
+            background-color: #fff0f0;
+            border-left-color: #e74c3c;
+        }
+
+        #task3 button {
+            background-color: #e74c3c;
+        }
+
+        #task3 button:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💳 ATM Систем</h1>
+
+        <!-- Даалгавар 1 -->
+        <div class="task" id="task1">
+            <h2>4 оронтой тооны цифрүүдийн нийлбэр</h2>
+            <p>4 оронтой тоо оруулна уу</p>
+            <input type="text" id="numberInput" placeholder="Жишээ: 1234">
+            <button onclick="calculateSum()">Нийлбэр бодох</button>
+            <p id="sumResult"></p>
+        </div>
+
+        <!-- Даалгавар 2 -->
+        <div class="task" id="task2">
+            <h2>Дансны үлдэгдэл</h2>
+            <p>Дансны үлдэгдэл хамгийн багадаа <strong>50₮</strong> байна. Зарлага бүрд 100₮ шимтгэлтэй.</p>
+            <div class="atm-balance">
+                <p>Одоогийн үлдэгдэл: <span id="balance">1000</span>₮</p>
+                <input type="number" id="amountInput" placeholder="Дүн оруулна уу">
+                <div class="atm-buttons">
+                    <button onclick="deposit()">Орлого нэмэх</button>
+                    <button onclick="withdraw()">Зарлага гаргах</button>
+                </div>
+                <p id="atmMessage"></p>
+            </div>
+        </div>
+
+        <!-- Даалгавар 3 -->
+        <div class="task" id="task3">
+            <h2>Гарах</h2>
+            <button onclick="exitSystem()">Системээс гарах</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. 4 оронтой тооны цифрийн нийлбэр
+        function calculateSum() {
+            const input = document.getElementById('numberInput').value.trim();
+            const result = document.getElementById('sumResult');
+
+            if (/[a-zA-Zа-яА-Я]/.test(input)) {
+                result.textContent = "❌ Үсэг оруулах боломжгүй!";
+                result.style.color = "red";
+                return;
+            }
+
+            const number = Math.abs(parseInt(input));
+
+            if (isNaN(number) || number < 1000 || number > 9999) {
+                result.textContent = "⚠️ Зөвхөн 4 оронтой тоо оруулна уу!";
+                result.style.color = "red";
+                return;
+            }
+
+            let sum = 0;
+            let temp = number;
+            while (temp > 0) {
+                sum += temp % 10;
+                temp = Math.floor(temp / 10);
+            }
+
+            result.textContent = `✅ Цифрүүдийн нийлбэр: ${sum}`;
+            result.style.color = "green";
+        }
+
+        // 2. ATM систем
+        let balance = 1000;
+
+        function updateBalance() {
+            document.getElementById('balance').textContent = balance;
+            document.getElementById('atmMessage').textContent = "";
+        }
+
+        function deposit() {
+            const amount = parseInt(document.getElementById('amountInput').value);
+            const message = document.getElementById('atmMessage');
+
+            if (isNaN(amount) || amount <= 0) {
+                message.textContent = "❌ Зөв орлогын дүн оруулна уу!";
+                message.style.color = "red";
+                return;
+            }
+
+            balance += amount;
+            updateBalance();
+            message.textContent = `✅ ${amount}₮ амжилттай нэмэгдлээ.`;
+            message.style.color = "green";
+            document.getElementById('amountInput').value = "";
+        }
+
+        function withdraw() {
+            const amount = parseInt(document.getElementById('amountInput').value);
+            const message = document.getElementById('atmMessage');
+            const fee = 100;
+
+            if (isNaN(amount) || amount <= 0) {
+                message.textContent = "❌ Зөв зарлагын дүн оруулна уу!";
+                message.style.color = "red";
+                return;
+            }
+
+            const total = amount + fee;
+
+            if (balance - total < 100) {
+                message.textContent = "⚠️ Үлдэгдэл 100₮-с доош байж болохгүй! (Шимтгэл 100₮)";
+                message.style.color = "red";
+                return;
+            }
+
+            balance -= total;
+            updateBalance();
+            message.textContent = `✅ ${amount}₮ зарлагадлаа (Шимтгэл: 100₮).`;
+            message.style.color = "green";
+            document.getElementById('amountInput').value = "";
+        }
+
+        // 3. Системээс гарах
+        function exitSystem() {
+            if (confirm("Та системээс гарахдаа итгэлтэй байна уу?")) {
+                document.body.innerHTML = "<h1 style='text-align:center; color: #e74c3c;'>🚪 Та системээс гарлаа. Баярлалаа!</h1>";
+            }
+        }
+
+        // Эхлэхэд үлдэгдлийг шинэчлэх
+        updateBalance();
+    </script>
+</body>
+</html>
